@@ -349,9 +349,7 @@ def _cmd_reset(args: argparse.Namespace) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        prog="mw", description="mutt-wizard Python starter"
-    )
+    parser = argparse.ArgumentParser(prog="mw", description="mutt-wizard")
     sub = parser.add_subparsers(dest="command")
 
     add = sub.add_parser("add", help="Add an account")

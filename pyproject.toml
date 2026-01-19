@@ -1,7 +1,7 @@
 [project]
 name = "mutt-wizard"
-version = "0.1.2"
-description = "Python starter for configuring neomutt with Gmail OAuth."
+version = "0.1.3"
+description = "Tooling for configuring neomutt with Gmail OAuth."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
