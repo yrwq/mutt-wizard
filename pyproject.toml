@@ -1,0 +1,16 @@
+[project]
+name = "mutt-wizard"
+version = "0.1.2"
+description = "Python starter for configuring neomutt with Gmail OAuth."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "google-auth>=2.29.0",
+  "google-auth-oauthlib>=1.2.0",
+  "requests>=2.31.0",
+]
+
+[project.scripts]
+mw = "mutt_wizard.cli:main"
+mailsync = "mutt_wizard.mailsync:main"
