@@ -1,14 +1,37 @@
 # mutt-wizard
 
+Configure neomutt with Gmail app passwords (default) or OAuth (optional), and
+generate mbsync/msmtp configuration files.
 
-Configure neomutt with Gmail OAuth (XOAUTH2) and generate
-mbsync/msmtp configs under `~/.config/mutt-wizard`.
-
-This repo focuses on a minimal, readable setup for:
-- Gmail OAuth (no app passwords)
+This repo focuses on a minimal setup for:
+- Gmail app passwords (default, simple)
+- Gmail OAuth (optional)
 - neomutt account configs
 - isync/mbsync sync
 - msmtp sendmail
+
+## Table of contents
+
+- [Why this project](#why-this-project)
+- [What this tool creates](#what-this-tool-creates)
+- [Requirements](#requirements)
+- [Install](#install)
+- [Gmail app password (default, simplest)](#gmail-app-password-default-simplest)
+- [Gmail OAuth setup (optional)](#gmail-oauth-setup-optional)
+- [Why OAuth needs a plugin](#why-oauth-needs-a-plugin)
+- [Non-Gmail account](#non-gmail-account)
+- [Sync mail](#sync-mail)
+- [Commands](#commands)
+- [Reset (wipe everything created by mw)](#reset-wipe-everything-created-by-mw)
+- [macOS notes](#macos-notes)
+- [Linux notes](#linux-notes)
+- [Troubleshooting](#troubleshooting)
+
+## Why this project
+
+[Luke Smith’s](https://lukesmith.xyz/) original [mutt-wizard](https://github.com/lukesmithxyz/mutt-wizard) is effectively unmaintained, and Gmail now
+requires OAuth or app passwords. This repo keeps the idea alive with a
+readable Python setup that works today.
 
 ## What this tool creates
 
