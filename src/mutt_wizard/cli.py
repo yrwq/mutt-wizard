@@ -320,6 +320,10 @@ def _cmd_reset(args: argparse.Namespace) -> None:
     accounts = load_accounts(paths)
     emails = set(accounts.keys())
 
+    isyncrc = paths.config_home / "isyncrc"
+    if isyncrc.exists() and isyncrc.is_symlink():
+        isyncrc.unlink()
+
     for email in emails:
         account_path = paths.mutt_accounts / f"{email}.muttrc"
         if account_path.exists():
@@ -337,10 +341,6 @@ def _cmd_reset(args: argparse.Namespace) -> None:
 
     if paths.cache_dir.exists():
         shutil.rmtree(paths.cache_dir)
-
-    isyncrc = paths.config_home / "isyncrc"
-    if isyncrc.exists() and isyncrc.is_symlink():
-        isyncrc.unlink()
 
     if paths.msmtp_log.exists():
         paths.msmtp_log.unlink()
