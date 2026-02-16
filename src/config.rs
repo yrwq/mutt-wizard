@@ -3,7 +3,8 @@ use std::{env, path::PathBuf};
 use anyhow::{Context, Result};
 
 pub struct Config {
-    password_store: PathBuf
+    pub password_store: PathBuf,
+    pub domains: PathBuf,
 }
 
 impl Config {
@@ -14,8 +15,11 @@ impl Config {
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from(format!("{}/.password-store", home)));
 
+        let domains = PathBuf::from("domains.csv");
+
         Ok(Config{
-            password_store
+            password_store,
+            domains,
         })
     }
 

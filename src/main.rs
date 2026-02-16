@@ -22,6 +22,22 @@ enum Commands {
     Add {
         /// email address to add
         email: String,
+
+        /// imap server address
+        #[arg(short = 'i', long)]
+        imap: Option<String>,
+        
+        /// imap server port
+        #[arg(short = 'I', long)]
+        imap_port: Option<u16>,
+        
+        /// stmp server address
+        #[arg(short = 's', long)]
+        smtp: Option<String>,
+        
+        /// smtp server port
+        #[arg(short = 'S', long)]
+        smtp_port: Option<u16>,
     },
 }
 
@@ -33,10 +49,18 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::Add {
             email,
+            imap,
+            imap_port,
+            smtp,
+            smtp_port
         } => {
             Account::add(
                 &config,
                 email,
+                imap,
+                imap_port,
+                smtp,
+                smtp_port
             )?;
         }
     }
