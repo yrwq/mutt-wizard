@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 
 mod config;
 mod account;
+mod pass;
 
 use config::Config;
 use account::Account;
@@ -22,6 +23,10 @@ enum Commands {
     Add {
         /// email address to add
         email: String,
+
+        /// Password for account
+        #[arg(short = 'p', long)]
+        password: Option<String>,
 
         /// imap server address
         #[arg(short = 'i', long)]
@@ -49,6 +54,7 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::Add {
             email,
+            password,
             imap,
             imap_port,
             smtp,
@@ -57,6 +63,7 @@ fn main() -> Result<()> {
             Account::add(
                 &config,
                 email,
+                password,
                 imap,
                 imap_port,
                 smtp,

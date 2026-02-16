@@ -4,6 +4,7 @@ use regex::Regex;
 use anyhow::Result;
 
 use crate::config::Config;
+use crate::pass;
 
 pub struct Account {
     pub email: String,
@@ -17,6 +18,7 @@ impl Account {
     pub fn add(
         config: &Config,
         email: String,
+        password: Option<String>,
         imap: Option<String>,
         imap_port: Option<u16>,
         smtp: Option<String>,
@@ -50,6 +52,12 @@ impl Account {
             smtp_port
         };
 
+        if let Some(pass) = password {
+            pass::insert_password(&account.email, &pass)?;
+        } else {
+            pass::get_password(&account.email)?;
+        }
+
         println!("{}\n\
             {}:{}\n\
             {}:{}",
@@ -57,7 +65,7 @@ impl Account {
             account.imap,
             account.imap_port,
             account.smtp,
-            account.smtp_port
+            account.smtp_port,
             );
         Ok(())
     }
