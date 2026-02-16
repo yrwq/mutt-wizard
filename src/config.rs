@@ -24,10 +24,8 @@ impl Config {
         if !gpg_id.exists() {
             anyhow::bail!(
                 "run `pass init <yourgpgemail>` to set up a password archive.\n\
-                (if you don't already have a GPG key pair, first run `gpg --full-generate-key`.)"
+                if you don't already have a GPG key pair, first run `gpg --full-generate-key`."
             );
-        } else {
-            println!("{:?}", gpg_id);
         }
         Ok(())
     }
