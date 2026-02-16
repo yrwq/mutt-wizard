@@ -1,8 +1,1 @@
-.venv/
-__pycache__/
-*.pyc
-.python-version
-build/
-dist/
-*.egg-info/
-.DS_Store
+/target
