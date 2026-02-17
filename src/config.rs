@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 
 pub struct Config {
     pub password_store: PathBuf,
+    pub cachedir: PathBuf,
     pub domains: PathBuf,
     pub muttrc: PathBuf,
     pub mbsyncrc: PathBuf,
@@ -11,6 +12,8 @@ pub struct Config {
     pub msmtprc: PathBuf,
     pub msmtplog: PathBuf,
     pub sslcert: PathBuf,
+    pub maildir: PathBuf,
+    pub muttshare: PathBuf,
 }
 
 impl Config {
@@ -19,9 +22,16 @@ impl Config {
 
         let xdg_config = env::var("XDG_CONFIG_HOME")
             .unwrap_or_else(|_| format!("{}/.config", home));
+        let xdg_data = env::var("XDG_DATA_HOME")
+            .unwrap_or_else(|_| format!("{}/.local/share", home));
         let xdg_state = env::var("XDG_STATE_HOME")
             .unwrap_or_else(|_| format!("{}/.local/state", home));
+        let xdg_cache = env::var("XDG_CACHE_HOME")
+            .unwrap_or_else(|_| format!("{}/.cache", home));
 
+        let muttshare = PathBuf::from("/usr/local/share/mutt-wizard");
+
+        let maildir = PathBuf::from(format!("{}/mail", xdg_data));
         let muttrc = PathBuf::from(format!("{}/mutt/muttrc", xdg_config));
         let accdir = PathBuf::from(format!("{}/mutt/accounts", xdg_config));
 
@@ -36,13 +46,17 @@ impl Config {
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from(format!("{}/.password-store", home)));
 
+        let cachedir = PathBuf::from(format!("{}/mutt-wizard", xdg_cache));
         let domains = PathBuf::from("domains.csv");
 
         let sslcert = Self::find_ssl_cert()?;
 
         Ok(Config{
+            cachedir,
             password_store,
+            muttshare,
             domains,
+            maildir,
             muttrc,
             mbsyncrc,
             sslcert,

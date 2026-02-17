@@ -11,6 +11,8 @@ use crate::templates;
 pub struct Account {
     pub email: String,
     pub login: String,
+    pub realname: String,
+    pub maildir: String,
     pub imap: String,
     pub imap_port: u16,
     pub smtp: String,
@@ -21,6 +23,7 @@ pub fn add(
     config: &Config,
     email: String,
     login: Option<String>,
+    realname: Option<String>,
     password: Option<String>,
     imap: Option<String>,
     imap_port: Option<u16>,
@@ -47,11 +50,13 @@ pub fn add(
         )
     };
 
-    let login = email.split("@").next().unwrap().to_string();
+    let login = login.unwrap_or_else(|| email.split("@").next().unwrap().to_string());
 
     let account = Account {
         email: email.clone(),
+        maildir: format!("{}/{}", config.maildir.display(), email),
         login,
+        realname: realname.unwrap_or_else(|| email.split('@').next().unwrap().to_string()),
         imap,
         imap_port,
         smtp,

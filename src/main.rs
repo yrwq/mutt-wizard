@@ -28,6 +28,10 @@ enum Commands {
         #[arg(short = 'u', long)]
         login: Option<String>,
 
+        /// real name to be on the email account
+        #[arg(short = 'n', long)]
+        realname: Option<String>,
+
         /// Password for account
         #[arg(short = 'p', long)]
         password: Option<String>,
@@ -59,6 +63,7 @@ fn main() -> Result<()> {
         Commands::Add {
             email,
             login,
+            realname,
             password,
             imap,
             imap_port,
@@ -69,6 +74,7 @@ fn main() -> Result<()> {
                 &config,
                 email,
                 login,
+                realname,
                 password,
                 imap,
                 imap_port,

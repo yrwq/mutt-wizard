@@ -33,7 +33,7 @@ pub fn get_password(email: &str) -> Result<()> {
     if let Ok(output) = check {
         if output.status.success() {
             use std::io::{self, Write};
-            print!("wordpass already exists for {}.\nuse existing password? [Y/n]: ", email);
+            print!("password already exists for {}.\nuse existing password? [Y/n]: ", email);
             io::stdout().flush()?;
             
             let mut response = String::new();
