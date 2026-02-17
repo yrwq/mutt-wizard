@@ -7,11 +7,9 @@ use crate::pass;
 pub fn get_mailboxes(account: &Account) -> Result<Vec<String>> {
     let password = pass::read_password(&account.email)?;
 
-    let login = account.email.split("@").next().unwrap();
-
     let url = format!(
         "imaps://{}@{}:{}",
-        login, account.imap, account.imap_port
+        account.login, account.imap, account.imap_port
     );
 
     let output = Command::new("curl")

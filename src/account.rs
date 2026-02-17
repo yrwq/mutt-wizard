@@ -6,9 +6,11 @@ use anyhow::Result;
 use crate::config::Config;
 use crate::pass;
 use crate::mailbox;
+use crate::templates;
 
 pub struct Account {
     pub email: String,
+    pub login: String,
     pub imap: String,
     pub imap_port: u16,
     pub smtp: String,
@@ -18,6 +20,7 @@ pub struct Account {
 pub fn add(
     config: &Config,
     email: String,
+    login: Option<String>,
     password: Option<String>,
     imap: Option<String>,
     imap_port: Option<u16>,
@@ -44,8 +47,11 @@ pub fn add(
         )
     };
 
+    let login = email.split("@").next().unwrap().to_string();
+
     let account = Account {
         email: email.clone(),
+        login,
         imap,
         imap_port,
         smtp,
@@ -59,6 +65,13 @@ pub fn add(
     }
 
     let mailboxes = mailbox::get_mailboxes(&account)?;
+
+    let idnum = get_next_id_number(config)?;
+    templates::generate_configs(config, &account, &mailboxes, idnum)?;
+
+    // debug only
+
+    println!("{}", idnum);
 
     for mb in mailboxes {
         println!("{}", mb);

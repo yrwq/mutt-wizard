@@ -5,6 +5,7 @@ mod config;
 mod account;
 mod pass;
 mod mailbox;
+mod templates;
 
 use config::Config;
 
@@ -22,6 +23,10 @@ enum Commands {
     Add {
         /// email address to add
         email: String,
+
+        /// login username if not full address
+        #[arg(short = 'u', long)]
+        login: Option<String>,
 
         /// Password for account
         #[arg(short = 'p', long)]
@@ -53,6 +58,7 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::Add {
             email,
+            login,
             password,
             imap,
             imap_port,
@@ -62,6 +68,7 @@ fn main() -> Result<()> {
             account::add(
                 &config,
                 email,
+                login,
                 password,
                 imap,
                 imap_port,
