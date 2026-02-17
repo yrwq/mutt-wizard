@@ -6,6 +6,7 @@ mod account;
 mod pass;
 mod mailbox;
 mod templates;
+mod utils;
 
 use config::Config;
 

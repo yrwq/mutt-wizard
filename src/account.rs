@@ -3,12 +3,13 @@ use std::io::Write;
 use std::{fs, path::Path};
 
 use regex::Regex;
-use anyhow::Result;
+use anyhow::{Result, Context};
 
 use crate::config::Config;
 use crate::pass;
 use crate::mailbox;
 use crate::templates;
+use crate::utils;
 
 pub struct Account {
     pub email: String,
@@ -142,7 +143,65 @@ fn get_account_list(config: &Config) -> Result<Vec<(usize, String)>> {
 }
 
 pub fn delete_account(config: &Config, email: Option<String>, purge: bool) -> Result<()> {
-    todo!()
+    let addr = if let Some(email) = email {
+        email
+    } else {
+        list_accounts(config)?;
+        
+        print!("delete (id): ");
+        io::stdout().flush()?;
+        let mut input = String::new();
+        io::stdin().read_line(&mut input)?;
+        
+        let num: usize = input.trim().parse()
+            .context("invalid number")?;
+        
+        let accounts = get_account_list(config)?;
+        accounts.iter()
+            .find(|(n, _)| *n == num)
+            .map(|(_, email)| email.clone())
+            .context("account not found")?
+    };
+
+    // mbsyncrc
+    utils::remove_section_from_file(
+        &config.mbsyncrc,
+        &format!("IMAPStore {}-remote", addr),
+        "# End profile",
+    )?;
+
+    // account files
+    let acc_file = config.accdir.join(format!("{}.muttrc", addr));
+    if acc_file.exists() {
+        fs::remove_file(&acc_file)?;
+    }
+
+    // muttrc
+    utils::remove_lines_matching(&config.muttrc, &addr)?;
+
+    // msmtprc
+    utils::remove_section_from_file(
+        &config.msmtprc,
+        &format!("account {}", addr),
+        "account",
+    )?;
+
+    // local mail if requested
+    if purge {
+        let safename = addr.replace('@', "_");
+        let cache_path = format!("{}/{}", config.cachedir.display(), safename);
+        let mail_path = format!("{}/{}", config.maildir.display(), addr);
+        
+        if Path::new(&cache_path).exists() {
+            fs::remove_dir_all(&cache_path)?;
+        }
+        if Path::new(&mail_path).exists() {
+            fs::remove_dir_all(&mail_path)?;
+        }
+    }
+
+    println!("{} deleted.", addr);
+    Ok(())
 }
 
 fn parse_domain_info(
