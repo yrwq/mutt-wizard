@@ -5,6 +5,7 @@ use anyhow::Result;
 
 use crate::config::Config;
 use crate::pass;
+use crate::mailbox;
 
 pub struct Account {
     pub email: String,
@@ -58,6 +59,12 @@ impl Account {
             pass::get_password(&account.email)?;
         }
 
+        let mailboxes = mailbox::get_mailboxes(&account)?;
+
+        for mb in mailboxes {
+            println!("{}", mb);
+        }
+
         println!("{}\n\
             {}:{}\n\
             {}:{}",
@@ -67,6 +74,7 @@ impl Account {
             account.smtp,
             account.smtp_port,
             );
+
         Ok(())
     }
 }

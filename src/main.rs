@@ -4,6 +4,7 @@ use clap::{Parser, Subcommand};
 mod config;
 mod account;
 mod pass;
+mod mailbox;
 
 use config::Config;
 use account::Account;

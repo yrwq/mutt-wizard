@@ -7,7 +7,7 @@ pub fn insert_password(email: &str, password: &str) -> Result<()> {
         .arg("insert")
         .arg("-f")
         .arg("-e")
-        .arg(&email)
+        .arg(email)
         .stdin(Stdio::piped())
         .spawn()
         .context("Failed to spawn pass insert")?;
@@ -30,14 +30,14 @@ pub fn get_password(email: &str) -> Result<()> {
         let _ = Command::new("pass")
             .arg("rm")
             .arg("-f")
-            .arg(&email)
+            .arg(email)
             .output();
 
         // Insert new password
         let status = Command::new("pass")
             .arg("insert")
             .arg("-f")
-            .arg(&email)
+            .arg(email)
             .status()
             .context("Failed to run pass insert")?;
 
@@ -47,4 +47,21 @@ pub fn get_password(email: &str) -> Result<()> {
     }
 
     Ok(())
+}
+
+pub fn read_password(email: &str) -> Result<String> {
+    let output = Command::new("pass")
+        .arg("show")
+        .arg(email)
+        .output()
+        .context("Failed to read password")?;
+
+    if !output.status.success() {
+        anyhow::bail!("Password not found for {}", email);
+    }
+
+    let password = String::from_utf8(output.stdout)
+        .context("Invalid UTF-8 in password")?;
+    
+    Ok(password.trim().to_string())
 }
