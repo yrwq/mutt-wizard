@@ -5,11 +5,16 @@ use anyhow::{Context, Result};
 pub struct Config {
     pub password_store: PathBuf,
     pub domains: PathBuf,
+    pub muttrc: PathBuf,
 }
 
 impl Config {
     pub fn load() -> Result<Self> {
         let home = env::var("HOME").context("HOME not set")?;
+        let xdg_config = env::var("XDG_CONFIG_HOME")
+            .unwrap_or_else(|_| format!("{}/.config", home));
+
+        let muttrc = PathBuf::from(format!("{}/mutt/muttrc", xdg_config));
 
         let password_store = env::var("PASSWORD_STORE_DIR")
             .map(PathBuf::from)
@@ -20,6 +25,7 @@ impl Config {
         Ok(Config{
             password_store,
             domains,
+            muttrc,
         })
     }
 

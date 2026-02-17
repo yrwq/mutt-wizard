@@ -7,8 +7,6 @@ mod pass;
 mod mailbox;
 
 use config::Config;
-use account::Account;
-
 
 #[derive(Parser)]
 #[command(name = "mw")]
@@ -61,7 +59,7 @@ fn main() -> Result<()> {
             smtp,
             smtp_port
         } => {
-            Account::add(
+            account::add(
                 &config,
                 email,
                 password,

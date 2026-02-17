@@ -25,15 +25,29 @@ pub fn insert_password(email: &str, password: &str) -> Result<()> {
 }
 
 pub fn get_password(email: &str) -> Result<()> {
+    let check = Command::new("pass")
+        .arg("show")
+        .arg(email)
+        .output();
+    
+    if let Ok(output) = check {
+        if output.status.success() {
+            use std::io::{self, Write};
+            print!("wordpass already exists for {}.\nuse existing password? [Y/n]: ", email);
+            io::stdout().flush()?;
+            
+            let mut response = String::new();
+            io::stdin().read_line(&mut response)?;
+            let response = response.trim().to_lowercase();
+            
+            if response.is_empty() || response == "y" || response == "yes" {
+                println!("Using existing password.");
+                return Ok(());
+            }
+        }
+    }
+    
     loop {
-        // remove any existing password
-        let _ = Command::new("pass")
-            .arg("rm")
-            .arg("-f")
-            .arg(email)
-            .output();
-
-        // Insert new password
         let status = Command::new("pass")
             .arg("insert")
             .arg("-f")
