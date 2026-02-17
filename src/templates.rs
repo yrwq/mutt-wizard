@@ -249,8 +249,9 @@ alternative_order text/plain text/enriched text/html
 set sidebar_visible = yes
 set sidebar_width = 20
 set sidebar_short_path = yes
-set sidebar_format = '%D%?F? [%F]?%* %?N?%N/?%S'
+set sidebar_next_new_wrap = yes
 set mail_check_stats
+set sidebar_format = '%D%?F? [%F]?%* %?N?%N/? %?S?%S?'
 
 # colors
 color indicator brightwhite blue
@@ -273,6 +274,24 @@ bind index k previous-entry
 bind attach <return> view-mailcap
 bind attach l view-mailcap
 bind editor <space> noop
+bind pager,attach h exit
+bind pager j next-line
+bind pager k previous-line
+bind pager l view-attachments
+bind index D delete-message
+bind index U undelete-message
+bind index h noop
+bind index,query <space> tag-entry
+bind browser l select-entry
+bind index,pager,browser d half-down
+bind index,pager,browser u half-up
+bind index,pager S sync-mailbox
+bind editor <Tab> complete-query
+
+macro index O "<shell-escape>mailsync<enter>" "run mailsync to sync all mail"
+
+# add someone to abook
+macro index,pager a "<enter-command>set my_pipe_decode=\$pipe_decode pipe_decode<return><pipe-message>abook --add-email<return><enter-command>set pipe_decode=\$my_pipe_decode; unset my_pipe_decode<return>" "add the sender address to abook"
 
 # sidebar navigation
 bind index,pager \Ck sidebar-prev
