@@ -271,17 +271,6 @@ bind index _ collapse-all
         muttrc_content.push_str(&format!("{}\n", acc_source));
     }
 
-    // macro for switching accounts
-    let mutt_macro = format!(
-        r#"bind index i noop
-bind pager i noop
-macro index,pager i{} '<sync-mailbox><enter-command>source {}<enter><change-folder>!<enter>;<check-stats>' "switch to {}"
-"#,
-        idnum,
-        acc_file.display(),
-        account.email
-    );
-    
     // add unbind once
     if !muttrc_content.contains("bind index i noop") {
         muttrc_content.push_str("bind index i noop\n");

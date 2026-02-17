@@ -1,3 +1,5 @@
+use std::io;
+use std::io::Write;
 use std::{fs, path::Path};
 
 use regex::Regex;
@@ -38,6 +40,20 @@ pub fn add(
         anyhow::bail!("{} is not a valid email address", email);
     }
 
+    // account already exists
+    if account_exists(config, &email)? {
+        print!("{} already exists.\ndo you want to reconfigure it? [y/N]: ", email);
+        io::stdout().flush()?;
+        let mut response = String::new();
+        io::stdin().read_line(&mut response)?;
+        
+        if !response.trim().to_lowercase().starts_with('y') {
+            return Ok(());
+        }
+        
+        println!("Reconfiguring existing account {}...", email);
+    }
+
     // parse domain info from domains.csv
     let (imap, imap_port, smtp, smtp_port) = if imap.is_none() || smtp.is_none() {
         parse_domain_info(config, &email, imap, imap_port, smtp, smtp_port)?
@@ -74,6 +90,11 @@ pub fn add(
     let idnum = get_next_id_number(config)?;
     templates::generate_configs(config, &account, &mailboxes, idnum)?;
 
+    let safename = account.email.replace('@', "_");
+    fs::create_dir_all(format!("{}/{}/bodies", config.cachedir.display(), safename))?;
+
+    println!("{} (account #{}) added successfully.", account.email, idnum);
+
     // create mailbox structure
     for mailbox in &mailboxes {
         let mailbox_path = format!("{}/{}", account.maildir, mailbox);
@@ -82,25 +103,12 @@ pub fn add(
         }
     }
 
-    // debug only
-
-    println!("{}", idnum);
-
-    for mb in mailboxes {
-        println!("{}", mb);
-    }
-
-    println!("{}\n\
-        {}:{}\n\
-        {}:{}",
-        account.email,
-        account.imap,
-        account.imap_port,
-        account.smtp,
-        account.smtp_port,
-        );
-
     Ok(())
+}
+
+fn account_exists(config: &Config, email: &str) -> Result<bool> {
+    let acc_file = config.accdir.join(format!("{}.muttrc", email));
+    Ok(acc_file.exists())
 }
 
 fn parse_domain_info(
