@@ -74,6 +74,14 @@ pub fn add(
     let idnum = get_next_id_number(config)?;
     templates::generate_configs(config, &account, &mailboxes, idnum)?;
 
+    // create mailbox structure
+    for mailbox in &mailboxes {
+        let mailbox_path = format!("{}/{}", account.maildir, mailbox);
+        for subdir in &["cur", "tmp", "new"] {
+            fs::create_dir_all(format!("{}/{}", mailbox_path, subdir))?;
+        }
+    }
+
     // debug only
 
     println!("{}", idnum);

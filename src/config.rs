@@ -29,7 +29,7 @@ impl Config {
         let xdg_cache = env::var("XDG_CACHE_HOME")
             .unwrap_or_else(|_| format!("{}/.cache", home));
 
-        let muttshare = PathBuf::from("/usr/local/share/mutt-wizard");
+        let muttshare = PathBuf::from(format!("{}/mutt-wizard", xdg_data));
 
         let maildir = PathBuf::from(format!("{}/mail", xdg_data));
         let muttrc = PathBuf::from(format!("{}/mutt/muttrc", xdg_config));

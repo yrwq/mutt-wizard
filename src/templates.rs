@@ -209,7 +209,6 @@ set mbox_type = Maildir
     content.push_str("set trash = \"+Trash\"\n");
     content.push_str("set record = \"+Sent\"\n\n");
 
-    // Add mailboxes list
     content.push_str("mailboxes ");
     for (i, mailbox) in mailboxes.iter().enumerate() {
         if i > 0 {
@@ -219,21 +218,71 @@ set mbox_type = Maildir
     }
     content.push('\n');
 
-    // write account muttrc
+    // account muttrc
     let acc_file = config.accdir.join(format!("{}.muttrc", account.email));
     fs::write(&acc_file, content)?;
 
-    // update main muttrc
+    // main muttrc
     if !config.muttrc.exists() {
         fs::write(&config.muttrc, "# vim: filetype=neomuttrc\n")?;
     }
 
     let mut muttrc_content = fs::read_to_string(&config.muttrc)?;
 
-    // mutt-wizard source if not present
-    let wizard_source = format!("source {}/mutt-wizard.muttrc", config.muttshare.display());
-    if !muttrc_content.contains(&wizard_source) {
-        muttrc_content.push_str(&format!("\n{}\n", wizard_source));
+    // mutt-wizard source if not present and file exists
+    let wizard_muttrc = config.muttshare.join("mutt-wizard.muttrc");
+    if wizard_muttrc.exists() {
+        let wizard_source = format!("source {}", wizard_muttrc.display());
+        if !muttrc_content.contains(&wizard_source) {
+            muttrc_content.push_str(&format!("\n{}\n", wizard_source));
+        }
+    } else {
+        if let Some(parent) = wizard_muttrc.parent() {
+            let _ = fs::create_dir_all(parent);
+        }
+        let minimal_wizard = r#"# mw shared config
+# basic
+set sleep_time = 0
+set sort = threads
+set sort_aux = reverse-last-date-received
+set mail_check = 60
+set timeout = 10
+
+# sidebar
+set sidebar_visible = yes
+set sidebar_width = 20
+set sidebar_short_path = yes
+set sidebar_format = '%D%?F? [%F]?%* %?N?%N/?%S'
+set mail_check_stats
+
+# colors
+color indicator brightwhite blue
+color sidebar_new yellow default
+
+# keys
+bind index,pager g noop
+bind index gg first-entry
+bind index G last-entry
+bind pager gg top
+bind pager G bottom
+bind index,pager \Cf next-page
+bind index,pager \Cb previous-page
+
+# sidebar navigation
+bind index,pager \Ck sidebar-prev
+bind index,pager \Cj sidebar-next
+bind index,pager \Co sidebar-open
+
+# Threading
+bind index - collapse-thread
+bind index _ collapse-all
+"#;
+        let _ = fs::write(&wizard_muttrc, minimal_wizard);
+        
+        let wizard_source = format!("source {}", wizard_muttrc.display());
+        if !muttrc_content.contains(&wizard_source) {
+            muttrc_content.push_str(&format!("\n{}\n", wizard_source));
+        }
     }
 
     // account source
@@ -244,13 +293,28 @@ set mbox_type = Maildir
 
     // macro for switching accounts
     let mutt_macro = format!(
-        r#"macro index,pager i{} '<sync-mailbox><enter-command>source {}<enter><change-folder>!<enter>;<check-stats>' "switch to {}"
+        r#"bind index i noop
+bind pager i noop
+macro index,pager i{} '<sync-mailbox><enter-command>source {}<enter><change-folder>!<enter>;<check-stats>' "switch to {}"
 "#,
         idnum,
         acc_file.display(),
         account.email
     );
-    muttrc_content.push_str(&mutt_macro);
+    
+    // add unbind once
+    if !muttrc_content.contains("bind index i noop") {
+        muttrc_content.push_str("bind index i noop\n");
+        muttrc_content.push_str("bind pager i noop\n");
+    }
+    
+    muttrc_content.push_str(&format!(
+        r#"macro index,pager i{} '<sync-mailbox><enter-command>source {}<enter><change-folder>!<enter>;<check-stats>' "switch to {}"
+"#,
+        idnum,
+        acc_file.display(),
+        account.email
+    ));
 
     fs::write(&config.muttrc, muttrc_content)?;
 
