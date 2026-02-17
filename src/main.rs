@@ -57,6 +57,8 @@ enum Commands {
     List,
     /// reset everything (purge configs)
     Reset,
+    /// sync mailbox
+    Sync,
     /// remove an account
     Delete {
         /// address to delete (interactive if not provided)
@@ -96,6 +98,9 @@ fn main() -> Result<()> {
                 smtp_port
             )?;
         }
+        Commands::Sync => {
+            mailbox::sync(&config)?;
+        },
         Commands::List => {
             account::list_accounts(&config)?;
         },

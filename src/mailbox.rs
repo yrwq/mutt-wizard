@@ -2,6 +2,7 @@ use anyhow::Result;
 use std::process::Command;
 
 use crate::account::Account;
+use crate::config::Config;
 use crate::pass;
 
 pub fn get_mailboxes(account: &Account) -> Result<Vec<String>> {
@@ -64,4 +65,12 @@ pub fn get_mailboxes(account: &Account) -> Result<Vec<String>> {
     } else {
         Ok(mailboxes)
     }
+}
+
+pub fn sync(config: &Config) -> Result<()> {
+    Command::new("mbsync")
+        .arg("-a")
+        .arg("-c")
+        .arg(&config.mbsyncrc);
+    Ok(())
 }
