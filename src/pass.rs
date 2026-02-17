@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use std::process::{Command, Stdio};
 use std::io::Write;
+use std::io;
 
 pub fn insert_password(email: &str, password: &str) -> Result<()> {
     let mut child = Command::new("pass")
@@ -32,10 +33,8 @@ pub fn get_password(email: &str) -> Result<()> {
     
     if let Ok(output) = check {
         if output.status.success() {
-            use std::io::{self, Write};
             print!("password already exists for {}.\nuse existing password? [Y/n]: ", email);
             io::stdout().flush()?;
-            
             let mut response = String::new();
             io::stdin().read_line(&mut response)?;
             let response = response.trim().to_lowercase();

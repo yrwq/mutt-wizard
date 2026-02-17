@@ -55,6 +55,8 @@ enum Commands {
     },
     /// list all accounts
     List,
+    /// reset everything (purge configs)
+    Reset,
     /// remove an account
     Delete {
         /// address to delete (interactive if not provided)
@@ -96,6 +98,9 @@ fn main() -> Result<()> {
         }
         Commands::List => {
             account::list_accounts(&config)?;
+        },
+        Commands::Reset => {
+            Config::reset(&config)?;
         },
         Commands::Delete { email, purge } => {
             account::delete_account(&config, email, purge)?;

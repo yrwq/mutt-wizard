@@ -1,4 +1,7 @@
+use std::io;
+use std::io::Write;
 use std::{env, path::PathBuf};
+use std::{fs, path::Path};
 
 use anyhow::{Context, Result};
 
@@ -62,8 +65,49 @@ impl Config {
             sslcert,
             msmtprc,
             msmtplog,
-            accdir
+            accdir,
         })
+    }
+
+    pub fn reset(&self) -> Result<()> {
+        print!("reset everything? [y/N]: ");
+        io::stdout().flush()?;
+        let mut response = String::new();
+        io::stdin().read_line(&mut response)?;
+        let response = response.trim().to_lowercase();
+        
+        if response.is_empty() || response == "N" || response == "n" {
+            return Ok(());
+        }
+
+        let home = env::var("HOME").context("HOME not set")?;
+        let xdg_config = env::var("XDG_CONFIG_HOME")
+            .unwrap_or_else(|_| format!("{}/.config", home));
+
+        let mutt_dir = PathBuf::from(format!("{}/mutt", xdg_config));
+        let msmtp_dir = PathBuf::from(format!("{}/msmtp", xdg_config));
+        let mbsync_dir = PathBuf::from(format!("{}/mbsync", xdg_config));
+
+        if Path::new(&self.cachedir).exists() {
+            fs::remove_dir_all(&self.cachedir)?;
+        }
+        if Path::new(&self.muttshare).exists() {
+            fs::remove_dir_all(&self.muttshare)?;
+        }
+        if Path::new(&self.maildir).exists() {
+            fs::remove_dir_all(&self.maildir)?;
+        }
+        if Path::new(&mutt_dir).exists() {
+            fs::remove_dir_all(&mutt_dir)?;
+        }
+        if Path::new(&msmtp_dir).exists() {
+            fs::remove_dir_all(&msmtp_dir)?;
+        }
+        if Path::new(&mbsync_dir).exists() {
+            fs::remove_dir_all(&mbsync_dir)?;
+        }
+
+        Ok(())
     }
 
     pub fn check_pass_initialized(&self) -> Result<()> {
