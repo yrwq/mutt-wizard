@@ -42,16 +42,8 @@ pub fn add(
 
     // account already exists
     if account_exists(config, &email)? {
-        print!("{} already exists.\ndo you want to reconfigure it? [y/N]: ", email);
-        io::stdout().flush()?;
-        let mut response = String::new();
-        io::stdin().read_line(&mut response)?;
-        
-        if !response.trim().to_lowercase().starts_with('y') {
-            return Ok(());
-        }
-        
-        println!("Reconfiguring existing account {}...", email);
+        println!("{} already exists", email);
+        return Ok(());
     }
 
     // parse domain info from domains.csv
@@ -109,6 +101,48 @@ pub fn add(
 fn account_exists(config: &Config, email: &str) -> Result<bool> {
     let acc_file = config.accdir.join(format!("{}.muttrc", email));
     Ok(acc_file.exists())
+}
+
+pub fn list_accounts(config: &Config) -> Result<()> {
+    let accounts = get_account_list(config)?;
+    
+    if accounts.is_empty() {
+        println!("no accounts configured.");
+        return Ok(());
+    }
+
+    for (num, email) in accounts {
+        println!("{:>6}\t{}", num, email);
+    }
+
+    Ok(())
+}
+
+fn get_account_list(config: &Config) -> Result<Vec<(usize, String)>> {
+    if !config.accdir.exists() {
+        return Ok(Vec::new());
+    }
+
+    let mut accounts = Vec::new();
+    
+    for entry in fs::read_dir(&config.accdir)? {
+        let entry = entry?;
+        let path = entry.path();
+        
+        if path.extension().and_then(|s| s.to_str()) == Some("muttrc") {
+            if let Some(name) = path.file_stem().and_then(|s| s.to_str()) {
+                let email = name.split('-').last().unwrap_or(name);
+                accounts.push(email.to_string());
+            }
+        }
+    }
+
+    accounts.sort();
+    Ok(accounts.into_iter().enumerate().map(|(i, e)| (i + 1, e)).collect())
+}
+
+pub fn delete_account(config: &Config, email: Option<String>, purge: bool) -> Result<()> {
+    todo!()
 }
 
 fn parse_domain_info(

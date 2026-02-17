@@ -52,6 +52,17 @@ enum Commands {
         #[arg(short = 'S', long)]
         smtp_port: Option<u16>,
     },
+    /// list all accounts
+    List,
+    /// remove an account
+    Delete {
+        /// address to delete (interactive if not provided)
+        email: Option<String>,
+        
+        /// delete local email too
+        #[arg(short = 'X', long)]
+        purge: bool,
+    },
 }
 
 
@@ -81,6 +92,12 @@ fn main() -> Result<()> {
                 smtp,
                 smtp_port
             )?;
+        }
+        Commands::List => {
+            account::list_accounts(&config)?;
+        },
+        Commands::Delete { email, purge } => {
+            account::delete_account(&config, email, purge)?;
         }
     }
 
