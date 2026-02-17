@@ -1,16 +1,17 @@
-# mutt-wizard
+## mutt-wizard
 
-rust port of Luke Smith's [mutt-wizard](https://github.com/lukesmithxyz)
-Configures neomutt, mbsync, and msmtp for email.
+port of Luke Smith's [mutt-wizard](https://github.com/lukesmithxyz)
 
-## Installation
+configures neomutt, mbsync, and msmtp for email.
+
+### installation
 
 ```bash
 cargo build --release
 sudo cp target/release/mutt-wizard /usr/local/bin/mw
 ```
 
-## Prerequisites
+### prerequisites
 
 - neomutt or mutt
 - isync (mbsync)
@@ -18,71 +19,71 @@ sudo cp target/release/mutt-wizard /usr/local/bin/mw
 - pass (password-store)
 - gpg
 
-## Setup
+### setup
 
-Initialize pass if you haven't:
+initialize pass if you haven't:
 
 ```bash
 gpg --full-generate-key
 pass init your@email.com
 ```
 
-## Usage
+### usage
 
-Add an account:
+add an account:
 
 ```bash
 mw add user@gmail.com
 ```
 
-List accounts:
+list accounts:
 
 ```bash
 mw list
 ```
 
-Delete an account:
+delete an account:
 
 ```bash
 mw delete user@gmail.com
 ```
 
-Delete with local mail:
+delete with local mail:
 
 ```bash
 mw delete user@gmail.com -X
 ```
 
-Delete every account, local mail
+delete every account, local mail
 
 ```bash
 mw reset
 ```
 
-## After Setup
+### after setup
 
-Sync mail:
+sync mail:
 
 ```bash
 mbsync -a
 ```
 
-Open neomutt:
+open neomutt:
 
 ```bash
 neomutt
 ```
 
-## Gmail
+## gmail
 
-You need an app password, not your regular password:
+you need an app password, not your regular password:
 
-1. Enable 2FA in Google Account
-2. Go to Security -> App passwords
-3. Generate password
-4. Use that password when prompted
+1. enable 2FA in Google Account
+2. go to Security -> App passwords
+3. generate password
+4. use that password when prompted
 
-## Options
+## options
 
 ```bash
 mw add <email> [OPTIONS]
