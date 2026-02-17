@@ -79,7 +79,6 @@ fn generate_mbsyncrc(config: &Config, account: &Account) -> Result<()> {
         _ => "IMAPS",
     };
 
-    // check mbsync version
     let (master, slave) = get_mbsync_terms()?;
 
     let content = format!(
@@ -88,8 +87,9 @@ IMAPAccount {}
 Host {}
 Port {}
 User {}
-PassCmd "pass {}"
-SSLType {}
+PassCmd "pass show {}"
+AuthMechs LOGIN
+TLSType {}
 CertificateFile {}
 
 IMAPStore {}-remote
@@ -130,6 +130,10 @@ SyncState *
         account.email,
     );
 
+    if let Some(parent) = config.mbsyncrc.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
     let mut file = fs::OpenOptions::new()
         .create(true)
         .append(true)
@@ -144,30 +148,6 @@ SyncState *
     }
 
     Ok(())
-}
-
-
-fn get_mbsync_terms() -> Result<(&'static str, &'static str)> {
-    use std::process::Command;
-    
-    let output = Command::new("mbsync").arg("-v").output();
-    
-    if let Ok(output) = output {
-        let version = String::from_utf8_lossy(&output.stdout);
-        if let Some(ver_str) = version.split_whitespace().nth(1) {
-            let ver_parts: Vec<&str> = ver_str.split('.').collect();
-            if ver_parts.len() >= 2 {
-                if let (Ok(major), Ok(minor)) = (ver_parts[0].parse::<u32>(), ver_parts[1].parse::<u32>()) {
-                    let ver_num = major * 10 + minor;
-                    if ver_num > 14 {
-                        return Ok(("Far", "Near"));
-                    }
-                }
-            }
-        }
-    }
-    
-    Ok(("Master", "Slave"))
 }
 
 
@@ -319,4 +299,27 @@ macro index,pager i{} '<sync-mailbox><enter-command>source {}<enter><change-fold
     fs::write(&config.muttrc, muttrc_content)?;
 
     Ok(())
+}
+
+fn get_mbsync_terms() -> Result<(&'static str, &'static str)> {
+    use std::process::Command;
+    
+    let output = Command::new("mbsync").arg("-v").output();
+    
+    if let Ok(output) = output {
+        let version = String::from_utf8_lossy(&output.stdout);
+        if let Some(ver_str) = version.split_whitespace().nth(1) {
+            let ver_parts: Vec<&str> = ver_str.split('.').collect();
+            if ver_parts.len() >= 2 {
+                if let (Ok(major), Ok(minor)) = (ver_parts[0].parse::<u32>(), ver_parts[1].parse::<u32>()) {
+                    let ver_num = major * 10 + minor;
+                    if ver_num > 14 {
+                        return Ok(("Far", "Near"));
+                    }
+                }
+            }
+        }
+    }
+    
+    Ok(("Master", "Slave"))
 }
