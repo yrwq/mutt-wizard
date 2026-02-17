@@ -43,7 +43,7 @@ impl Config {
 
         let mbsyncrc = env::var("MBSYNCRC")
             .map(PathBuf::from)
-            .unwrap_or_else(|_| PathBuf::from(format!("{}/mbsync/mbsyncrc", xdg_config)));
+            .unwrap_or_else(|_| PathBuf::from(format!("{}/isyncrc", xdg_config)));
 
         let password_store = env::var("PASSWORD_STORE_DIR")
             .map(PathBuf::from)

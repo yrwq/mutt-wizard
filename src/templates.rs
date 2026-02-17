@@ -222,11 +222,28 @@ set mbox_type = Maildir
         }
         let minimal_wizard = r#"# mw shared config
 # basic
+set send_charset="us-ascii:utf-8"
+set date_format="%y/%m/%d %I:%M%p"
 set sleep_time = 0
 set sort = threads
+set query_command = "abook --mutt-query '%s'"
 set sort_aux = reverse-last-date-received
 set mail_check = 60
 set timeout = 10
+set markers = no
+set mark_old = no
+set mime_forward = no
+set forward_attachments = yes
+set wait_key = no
+set fast_reply
+set fcc_attach
+set forward_format = "Fwd: %s"
+set forward_quote
+set reverse_name
+set include
+auto_view text/html
+auto_view application/pgp-encrypted
+alternative_order text/plain text/enriched text/html
 
 # sidebar
 set sidebar_visible = yes
@@ -241,12 +258,21 @@ color sidebar_new yellow default
 
 # keys
 bind index,pager g noop
+bind index,pager i noop
+bind index,pager M noop
+bind index,pager C noop
+bind index \Cf noop
+
 bind index gg first-entry
 bind index G last-entry
 bind pager gg top
 bind pager G bottom
-bind index,pager \Cf next-page
-bind index,pager \Cb previous-page
+
+bind index j next-entry
+bind index k previous-entry
+bind attach <return> view-mailcap
+bind attach l view-mailcap
+bind editor <space> noop
 
 # sidebar navigation
 bind index,pager \Ck sidebar-prev
